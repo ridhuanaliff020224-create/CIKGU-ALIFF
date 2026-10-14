@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz PJPK Tahun 1 Gaya Kahoot Ceria</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #1e293b 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .shape {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 50%;
+        }
+        .shape:nth-child(1) { left: 10%; width: 80px; height: 80px; animation-delay: 0s; background: rgba(236, 72, 153, 0.2); }
+        .shape:nth-child(2) { left: 20%; width: 40px; height: 40px; animation-delay: 2s; animation-duration: 12s; background: rgba(59, 130, 246, 0.2); }
+        .shape:nth-child(3) { left: 35%; width: 60px; height: 60px; animation-delay: 4s; background: rgba(234, 179, 8, 0.2); }
+        .shape:nth-child(4) { left: 50%; width: 100px; height: 100px; animation-delay: 0s; animation-duration: 18s; background: rgba(168, 85, 247, 0.2); }
+        .shape:nth-child(5) { left: 65%; width: 50px; height: 50px; animation-delay: 3s; background: rgba(34, 197, 94, 0.2); }
+        .shape:nth-child(6) { left: 80%; width: 90px; height: 90px; animation-delay: 2s; background: rgba(249, 115, 22, 0.2); }
+        .shape:nth-child(7) { left: 90%; width: 30px; height: 30px; animation-delay: 7s; background: rgba(236, 72, 153, 0.2); }
+
+        @keyframes animate {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 50%; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 20%; }
+        }
+
+        .kahoot-card {
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 10px 15px -5px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .option-btn {
+            transition: all 0.15s ease-in-out;
+            transform: translateY(0);
+        }
+        .option-btn:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.1);
+        }
+        .option-btn:active {
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+
+    <div class="bg-shapes">
+        <span class="shape"></span>
+        <span class="shape"></span>
+        <span class="shape"></span>
+        <span class="shape"></span>
+        <span class="shape"></span>
+        <span class="shape"></span>
+        <span class="shape"></span>
+    </div>
+
+    <!-- Audio Control Floating Bar -->
+    <div class="absolute top-4 right-4 z-50 flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-white shadow-lg">
+        <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Lagu & Bunyi:</span>
+        <button id="audio-toggle-btn" onclick="toggleBackgroundMusic()" class="bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1 shadow">
+            🔊 <span id="audio-status-text">Muzik: Tutup</span>
+        </button>
+    </div>
+
+    <div id="app" class="w-full max-w-3xl mx-auto z-10 my-auto">
+        
+        <!-- ================= 1. SKRIN MASUKKAN NAMA ================= -->
+        <div id="name-screen" class="kahoot-card rounded-3xl p-8 text-center border-b-8 border-purple-600">
+            <div class="inline-block bg-purple-100 text-purple-700 px-4 py-1.5 rounded-full font-bold text-sm mb-4 animate-bounce">
+                🎮 KUIZ INTERAKTIF PJPK TAHUN 1
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Jom Main Kuiz PJPK!</h1>
+            <p class="text-gray-500 mb-8 text-lg">Uji minda kesihatan dan kecergasan anda gaya Kahoot!</p>
+            
+            <div class="max-w-md mx-auto space-y-4">
+                <input type="text" id="student-name" placeholder="Masukkan Nama Penuh Murid..." 
+                    class="w-full px-6 py-4 text-xl text-center border-4 border-purple-200 rounded-2xl focus:border-purple-600 focus:outline-none transition font-semibold placeholder:font-normal text-gray-800 shadow-inner"
+                    maxlength="30">
+                
+                <button onclick="startGame()" class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xl rounded-2xl shadow-lg border-b-4 border-purple-800 transition active:border-b-0 active:translate-y-1">
+                    Mula Kuiz Sekarang! 🚀
+                </button>
+            </div>
+            <div id="name-error" class="text-rose-500 font-semibold mt-3 hidden">Sila masukkan nama anda dahulu!</div>
+        </div>
+
+        <!-- ================= 2. SKRIN KUIZ / SOALAN ================= -->
+        <div id="quiz-screen" class="hidden">
+            <!-- Header Status -->
+            <div class="flex justify-between items-center mb-6 bg-white/15 backdrop-blur-md px-6 py-3 rounded-2xl text-white font-bold border border-white/20 shadow-lg">
+                <div id="question-counter" class="text-lg">Soalan 1 / 20</div>
+                <div class="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm shadow font-black">
+                    ⭐ Skor: <span id="current-score">0</span>
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div class="kahoot-card rounded-3xl p-6 md:p-8 mb-6 border-b-8 border-gray-400 text-center">
+                <div id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
+                    Soalan akan dipaparkan di sini...
+                </div>
+            </div>
+
+            <!-- Options Grid (Kahoot Colors Style) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Option A (Red) -->
+                <button onclick="selectOption(0)" id="opt-0" class="option-btn bg-rose-500 hover:bg-rose-600 text-white font-bold p-5 rounded-2xl text-left flex items-center shadow-lg border-b-6 border-rose-700 text-lg">
+                    <span class="bg-rose-700 w-10 h-10 rounded-xl flex items-center justify-center mr-4 text-xl flex-shrink-0">▲</span>
+                    <span id="text-opt-0">Pilihan A</span>
+                </button>
+                <!-- Option B (Blue) -->
+                <button onclick="selectOption(1)" id="opt-1" class="option-btn bg-blue-500 hover:bg-blue-600 text-white font-bold p-5 rounded-2xl text-left flex items-center shadow-lg border-b-6 border-blue-700 text-lg">
+                    <span class="bg-blue-700 w-10 h-10 rounded-xl flex items-center justify-center mr-4 text-xl flex-shrink-0">◆</span>
+                    <span id="text-opt-1">Pilihan B</span>
+                </button>
+                <!-- Option C (Yellow) -->
+                <button onclick="selectOption(2)" id="opt-2" class="option-btn bg-amber-500 hover:bg-amber-600 text-white font-bold p-5 rounded-2xl text-left flex items-center shadow-lg border-b-6 border-amber-700 text-lg md:col-span-2">
+                    <span class="bg-amber-700 w-10 h-10 rounded-xl flex items-center justify-center mr-4 text-xl flex-shrink-0">●</span>
+                    <span id="text-opt-2">Pilihan C</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= 3. SKRIN MAKLUM BALAS JAWAPAN ================= -->
+        <div id="feedback-screen" class="hidden kahoot-card rounded-3xl p-8 text-center border-b-8">
+            <div id="feedback-icon" class="text-7xl mb-4">🎉</div>
+            <h2 id="feedback-title" class="text-3xl md:text-4xl font-bold mb-3">Tahniah!</h2>
+            <p id="feedback-desc" class="text-gray-600 text-lg mb-6">Jawapan anda adalah betul.</p>
+            <div id="correct-answer-reveal" class="bg-blue-50 border-2 border-blue-200 text-blue-800 p-4 rounded-2xl mb-6 font-semibold hidden">
+                Jawapan yang sebetulnya ialah: <span id="reveal-text" class="font-bold underline"></span>
+            </div>
+            <button onclick="nextQuestion()" class="py-4 px-10 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl rounded-2xl shadow-lg border-b-4 border-indigo-800 transition active:border-b-0 active:translate-y-1">
+                Soalan Seterusnya ➡️
+            </button>
+        </div>
+
+        <!-- ================= 4. SKRIN KEPUTUSAN / SKOR AKHIR ================= -->
+        <div id="result-screen" class="hidden kahoot-card rounded-3xl p-8 text-center border-b-8 border-green-600">
+            <div class="text-6xl mb-3 animate-bounce">🏆</div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-1">Keputusan Kuiz PJPK</h1>
+            <p class="text-gray-500 text-lg mb-6">Hebat sekali, <span id="result-name" class="font-bold text-purple-600"></span>!</p>
+            
+            <div class="bg-purple-50 border-4 border-purple-200 rounded-3xl p-6 max-w-xs mx-auto mb-8 shadow-inner">
+                <div class="text-gray-600 font-semibold mb-1">Skor Akhir Anda</div>
+                <div class="text-5xl font-bold text-purple-700"><span id="final-score">0</span> / 20</div>
+                <div id="result-badge" class="mt-3 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-sm inline-block shadow">Cemerlang! ⭐</div>
+            </div>
+
+            <button onclick="restartQuiz()" class="py-4 px-8 bg-green-600 hover:bg-green-700 text-white font-bold text-xl rounded-2xl shadow-lg border-b-4 border-green-800 transition active:border-b-0 active:translate-y-1">
+                Main Semula 🔄
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Soalan Latihan Ulang Kaji PJPK Tahun 1 (20 soalan)
+        const quizData = [
+            {
+                question: "Apakah cara yang betul untuk menjaga kebersihan gigi?",
+                options: ["Menggosok gigi", "Makan gula-gula sepanjang hari", "Tidak berkumur selepas makan"],
+                answer: 0
+            },
+            {
+                question: "Mengapakah kita perlu mandi setiap hari?",
+                options: ["Supaya badan bersih", "Supaya badan berbau", "Supaya pakaian kotor"],
+                answer: 0
+            },
+            {
+                question: "Jika seseorang menyentuh kita dengan cara yang tidak selamat, apakah tindakan kita?",
+                options: ["Berdiam diri", "Berkata 'TIDAK' dan meminta bantuan orang dewasa yang dipercayai", "Mengikut sahaja arahannya"],
+                answer: 1
+            },
+            {
+                question: "Siapakah yang boleh memberikan ubat kepada kita apabila kita sakit?",
+                options: ["Doktor atau orang dewasa yang bertanggungjawab", "Orang yang tidak dikenali", "Rakan tanpa pengetahuan orang dewasa"],
+                answer: 0
+            },
+            {
+                question: "Apakah tindakan yang betul apabila ubat telah tamat tarikh luput?",
+                options: ["Memakannya", "Memberikannya kepada rakan", "Tidak mengambilnya dan memberitahu orang dewasa"],
+                answer: 2
+            },
+            {
+                question: "Ali berasa gembira apabila mendapat hadiah. Apakah emosi Ali?",
+                options: ["Sedih", "Gembira", "Takut"],
+                answer: 1
+            },
+            {
+                question: "Apakah tindakan yang sesuai apabila kita berasa sedih?",
+                options: ["Bercerita kepada orang dewasa yang dipercayai", "Memukul rakan", "Merosakkan barang"],
+                answer: 0
+            },
+            {
+                question: "Yang manakah merupakan keperluan asas manusia?",
+                options: ["Mainan baharu", "Makanan", "Permainan video"],
+                answer: 1
+            },
+            {
+                question: "Apakah cara menghormati ibu bapa?",
+                options: ["Menjerit kepada mereka", "Tidak mendengar nasihat", "Bercakap dengan sopan"],
+                answer: 2
+            },
+            {
+                question: "Siapakah yang boleh menjadi penjaga kita?",
+                options: ["Orang yang menjaga kita dengan bertanggungjawab", "Orang asing yang tidak dikenali", "Sesiapa sahaja tanpa kebenaran ibu bapa"],
+                answer: 0
+            },
+            {
+                question: "Apakah cara yang baik untuk berkawan?",
+                options: ["Mengejek rakan", "Berkongsi dan membantu rakan", "Bergaduh dengan rakan"],
+                answer: 1
+            },
+            {
+                question: "Apakah yang perlu kita lakukan apabila bercakap dengan guru?",
+                options: ["Bercakap dengan sopan", "Menjerit dengan kuat", "Berpaling dan meninggalkan guru"],
+                answer: 0
+            },
+            {
+                question: "Apakah yang dimaksudkan dengan kuman?",
+                options: ["Benda yang membantu kita bermain", "Benda halus yang boleh menyebabkan penyakit", "Makanan yang berkhasiat"],
+                answer: 1
+            },
+            {
+                question: "Bilakah kita perlu mencuci tangan?",
+                options: ["Sebelum makan dan selepas menggunakan tandas", "Selepas bermain sahaja", "Apabila tangan kelihatan sangat kotor sahaja"],
+                answer: 0
+            },
+            {
+                question: "Apakah yang perlu kita lakukan untuk mengelakkan penyakit?",
+                options: ["Berkongsi sapu tangan yang kotor", "Tidak mandi setiap hari", "Menjaga kebersihan diri"],
+                answer: 2
+            },
+            {
+                question: "Apakah tindakan yang betul apabila melihat rakan dibuli?",
+                options: ["Ketawa bersama-sama", "Memaklumkan kepada guru", "Turut membuli rakan"],
+                answer: 1
+            },
+            {
+                question: "Apakah tindakan yang betul apabila orang tidak dikenali mengajak kita mengikutnya?",
+                options: ["Mengikutnya dengan segera", "Menerima semua ajakannya", "Menolak dan memberitahu orang dewasa yang dipercayai"],
+                answer: 2
+            },
+            {
+                question: "Yang manakah makanan berkhasiat?",
+                options: ["Buah-buahan", "Gula-gula sahaja", "Minuman manis sahaja"],
+                answer: 0
+            },
+            {
+                question: "Mengapakah kita perlu bersarapan?",
+                options: ["Supaya kita berasa letih", "Untuk memberikan tenaga kepada badan", "Supaya kita tidak perlu makan sepanjang hari"],
+                answer: 1
+            },
+            {
+                question: "Bagaimanakah cara menyimpan makanan supaya bersih dan selamat?",
+                options: ["Membiarkan makanan terdedah kepada lalat", "Meletakkan makanan di atas lantai", "Menutup makanan dengan baik"],
+                answer: 2
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let playerName = "";
+
+        // Web Audio API Synthesizer & Sound Effects
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Kesan Bunyi Butang (Click / Tap Sound)
+        function playClickSound() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Kesan Bunyi Betul (Tada!)
+        function playCorrectSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.09);
+                    gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.09 + 0.2);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.09);
+                    osc.stop(now + idx * 0.09 + 0.2);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Kesan Bunyi Salah (Buzz!)
+        function playWrongSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, now);
+                osc.frequency.setValueAtTime(120, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Muzik Latar Ceria (Background Melody Loop)
+        function startBackgroundMusic() {
+            if (isMusicPlaying) return;
+            initAudio();
+            isMusicPlaying = true;
+            document.getElementById('audio-status-text').innerText = "Muzik: Buka";
+
+            const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 523.25, 440.00];
+            let noteIdx = 0;
+
+            musicInterval = setInterval(() => {
+                if (!isMusicPlaying || !audioCtx) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[noteIdx], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                    
+                    noteIdx = (noteIdx + 1) % notes.length;
+                } catch (e) {
+                    console.error(e);
+                }
+            }, 500);
+        }
+
+        function stopBackgroundMusic() {
+            isMusicPlaying = false;
+            document.getElementById('audio-status-text').innerText = "Muzik: Tutup";
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+            }
+        }
+
+        function toggleBackgroundMusic() {
+            playClickSound();
+            if (isMusicPlaying) {
+                stopBackgroundMusic();
+            } else {
+                startBackgroundMusic();
+            }
+        }
+
+        const nameScreen = document.getElementById('name-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const feedbackScreen = document.getElementById('feedback-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const studentNameInput = document.getElementById('student-name');
+        const nameError = document.getElementById('name-error');
+        const questionCounter = document.getElementById('question-counter');
+        const currentScoreSpan = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+
+        function startGame() {
+            playClickSound();
+            const name = studentNameInput.value.trim();
+            if (!name) {
+                nameError.classList.remove('hidden');
+                return;
+            }
+            playerName = name;
+            nameError.classList.add('hidden');
+            
+            // Auto start music when game starts if not already enabled
+            if (!isMusicPlaying) {
+                startBackgroundMusic();
+            }
+
+            nameScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = quizData[currentQuestionIndex];
+            questionCounter.innerText = `Soalan ${currentQuestionIndex + 1} / ${quizData.length}`;
+            currentScoreSpan.innerText = score;
+            questionText.innerText = q.question;
+
+            for (let i = 0; i < 3; i++) {
+                const btn = document.getElementById(`opt-${i}`);
+                const textSpan = document.getElementById(`text-opt-${i}`);
+                if (q.options[i]) {
+                    btn.style.display = "flex";
+                    textSpan.innerText = q.options[i];
+                } else {
+                    btn.style.display = "none";
+                }
+            }
+        }
+
+        function selectOption(selectedIndex) {
+            playClickSound();
+            const q = quizData[currentQuestionIndex];
+            const isCorrect = (selectedIndex === q.answer);
+
+            if (isCorrect) {
+                playCorrectSound();
+                score++;
+            } else {
+                playWrongSound();
+            }
+
+            quizScreen.classList.add('hidden');
+            feedbackScreen.classList.remove('hidden');
+
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDesc = document.getElementById('feedback-desc');
+            const correctReveal = document.getElementById('correct-answer-reveal');
+            const revealText = document.getElementById('reveal-text');
+
+            if (isCorrect) {
+                feedbackScreen.className = "kahoot-card rounded-3xl p-8 text-center border-b-8 border-emerald-500";
+                feedbackIcon.innerText = "🎉";
+                feedbackTitle.innerText = "Tahniah, Betul!";
+                feedbackTitle.className = "text-3xl md:text-4xl font-bold mb-3 text-emerald-600";
+                feedbackDesc.innerText = "Hebat! Anda menjawab dengan tepat.";
+                correctReveal.classList.add('hidden');
+            } else {
+                feedbackScreen.className = "kahoot-card rounded-3xl p-8 text-center border-b-8 border-rose-500";
+                feedbackIcon.innerText = "❌";
+                feedbackTitle.innerText = "Kurang Tepat!";
+                feedbackTitle.className = "text-3xl md:text-4xl font-bold mb-3 text-rose-600";
+                feedbackDesc.innerText = "Jangan putus asa, cuba lagi pada soalan seterusnya.";
+                
+                revealText.innerText = q.options[q.answer];
+                correctReveal.classList.remove('hidden');
+            }
+            currentScoreSpan.innerText = score;
+        }
+
+        function nextQuestion() {
+            playClickSound();
+            currentQuestionIndex++;
+            feedbackScreen.classList.add('hidden');
+
+            if (currentQuestionIndex < quizData.length) {
+                quizScreen.classList.remove('hidden');
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            playCorrectSound();
+            resultScreen.classList.remove('hidden');
+            document.getElementById('result-name').innerText = playerName;
+            document.getElementById('final-score').innerText = score;
+
+            const badge = document.getElementById('result-badge');
+            if (score === 20) {
+                badge.innerText = "Sempurna! Johan PJPK 🌟";
+            } else if (score >= 15) {
+                badge.innerText = "Cemerlang! Tahniah 🎉";
+            } else if (score >= 10) {
+                badge.innerText = "Bagus! Teruskan usaha 👍";
+            } else {
+                badge.innerText = "Cuba lagi untuk lebih cemerlang 💪";
+            }
+        }
+
+        function restartQuiz() {
+            playClickSound();
+            resultScreen.classList.add('hidden');
+            nameScreen.classList.remove('hidden');
+            studentNameInput.value = "";
+        }
+    </script>
+</body>
+</html>
